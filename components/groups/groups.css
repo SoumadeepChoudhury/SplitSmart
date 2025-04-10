@@ -1,0 +1,486 @@
+/* styles/globals.css or your CSS module */
+:root {
+    --theme-color: #1a1c31;
+    --theme-light: #2a2d4a;
+    --theme-lighter: #3a3d5a;
+    --card-bg: #2a2d4a;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b9c5;
+    --accent-color: #6c5ce7;
+    --positive-color: #00e676;
+    --negative-color: #ff5252;
+    --upcoming-color: #40c4ff;
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Groups Page Styles */
+.groups-app {
+    min-height: 100vh;
+    background-color: var(--theme-color);
+    color: var(--text-primary);
+    padding: 2rem;
+}
+
+.groups-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Action Bar */
+.groups-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-container {
+    flex-grow: 1;
+    position: relative;
+    min-width: 200px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    background-color: var(--theme-light);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    background-color: #2c2f4a;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.select-arrow {
+    position: absolute;
+    top: 55%;
+    right: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.sort-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.create-group-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.create-group-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.create-group-btn:hover {
+    background-color: #5a4dcc;
+    transform: translateY(-2px);
+}
+
+/* Group List */
+.group-list {
+    margin-top: 1.5rem;
+}
+
+.no-groups-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.no-groups-message svg {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.group-list-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.group-list-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.group-list-item:focus,
+.group-list-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.group-list-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: var(--accent-color);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.group-list-item:hover::after {
+    opacity: 1;
+}
+
+.group-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+    color: white;
+}
+
+.group-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.group-item-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.group-item-members {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.group-active-trips-badge {
+    background-color: rgba(0, 230, 118, 0.1);
+    color: var(--positive-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    margin-left: 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Create Group Form */
+.create-group-form-section {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.close-form-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.close-form-btn svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.close-form-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--theme-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5a4dcc;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--theme-light);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--theme-lighter);
+}
+
+/* Shareable Link */
+.shareable-link-display {
+    background-color: var(--theme-light);
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.shareable-link-display svg {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+.shareable-link-display p {
+    margin: 0 0 1rem;
+    color: var(--text-primary);
+}
+
+.link-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.link-container input {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    background-color: var(--theme-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.link-container input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#copy-link-btn {
+    padding: 0.75rem 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#copy-link-btn svg {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+}
+
+#copy-link-btn:hover {
+    background-color: #5a4dcc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .groups-app {
+        padding: 1.5rem;
+    }
+
+    .groups-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-container,
+    .sort-select,
+    .create-group-btn {
+        width: 100%;
+    }
+
+    .group-list-item {
+        padding: 1rem;
+    }
+
+    .group-avatar {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.25rem;
+        margin-right: 1rem;
+    }
+
+    .group-active-trips-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .groups-app {
+        padding: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .link-container {
+        flex-direction: column;
+    }
+}

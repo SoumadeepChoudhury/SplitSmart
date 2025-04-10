@@ -1,0 +1,725 @@
+/* styles/TripDetails.module.css or globals.css */
+:root {
+    --theme-color: #1a1c31;
+    --theme-light: #2a2d4a;
+    --theme-lighter: #3a3d5a;
+    --card-bg: #2a2d4a;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b9c5;
+    --accent-color: #6c5ce7;
+    --positive-color: #00e676;
+    --negative-color: #ff5252;
+    --upcoming-color: #40c4ff;
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Trip Details Page Styles */
+.trip-details-app {
+    min-height: 100vh;
+    background-color: var(--theme-color);
+    color: var(--text-primary);
+    padding: 2rem;
+    margin-bottom: 50px;
+}
+
+.trip-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Trip Header */
+.trip-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trip-name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.trip-group-context {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Tab Navigation */
+.trip-tabs-nav {
+    display: flex;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: -2px;
+    transition: var(--transition);
+}
+
+.tab-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.tab-button:hover {
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.tab-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+    border-radius: var(--border-radius-sm);
+}
+
+/* Tab Content Panes */
+.tab-pane {
+    display: none;
+    padding: 1rem 0;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.tab-pane h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tab-pane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tab-pane-header h2 {
+    margin-bottom: 0;
+}
+
+/* General List Styles */
+.content-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item {
+    background-color: var(--card-bg);
+    padding: 1.25rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.list-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: var(--accent-color);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.list-item:hover::after {
+    opacity: 1;
+}
+
+/* Expenses List Specifics */
+.expense-list-item {
+    cursor: pointer;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.expense-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: rgba(108, 92, 231, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent-color);
+}
+
+.expense-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.expense-details {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.amount_arrow {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.expense-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.expense-description {
+    font-weight: 500;
+}
+
+.expense-payer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.payer-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.expense-amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.expense-arrow {
+    color: var(--text-secondary);
+    margin-left: 1rem;
+}
+
+.expense-arrow svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Settle Up Tab Specifics */
+.settlement-section {
+    margin-bottom: 2rem;
+}
+
+.settlement-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.balance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.balance-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-sm);
+}
+
+.balance-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.balance-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.balance-text {
+    font-size: 0.95rem;
+}
+
+.amount {
+    font-weight: bold;
+}
+
+.positive-amount {
+    color: var(--positive-color);
+}
+
+.negative-amount {
+    color: var(--negative-color);
+}
+
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.transaction-item {
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.transaction-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.transaction-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.transaction-arrow {
+    color: var(--text-secondary);
+}
+
+.transaction-arrow svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.transaction-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-amount {
+    font-weight: bold;
+}
+
+.transaction-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.mark-paid-btn {
+    background-color: var(--theme-lighter) !important;
+}
+
+/* Summary Tab Specifics */
+.summary-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: rgba(108, 92, 231, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent-color);
+}
+
+.stat-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.stat-content {
+    flex-grow: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+
+.summary-chart-section h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.summary-chart-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.chart-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 50%;
+}
+
+
+.circular-chart {
+    width: 150px;
+    height: 150px;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: var(--theme-light);
+    stroke-width: 3;
+}
+
+/* 
+.circle-food {
+    fill: none;
+    stroke: #FF9E9E;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: circle-fill 1s ease-in-out;
+}
+
+.circle-transport {
+    fill: none;
+    stroke: #9EC5FF;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: circle-fill 1s ease-in-out;
+}
+
+.circle-activities {
+    fill: none;
+    stroke: #CAFFBF;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: circle-fill 1s ease-in-out;
+}
+
+.circle-accommodation {
+    fill: none;
+    stroke: #FFD6A5;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: circle-fill 1s ease-in-out;
+}
+
+.circle-other {
+    fill: none;
+    stroke: #BDB2FF;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: circle-fill 1s ease-in-out;
+}
+
+@keyframes circle-fill {
+    0% {
+        stroke-dasharray: 0, 100;
+    }
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.legend-color.food {
+    background-color: #FF9E9E;
+}
+
+.legend-color.transport {
+    background-color: #9EC5FF;
+}
+
+.legend-color.activities {
+    background-color: #CAFFBF;
+}
+
+.legend-color.accommodation {
+    background-color: #FFD6A5;
+}
+
+.legend-color.other {
+    background-color: #BDB2FF;
+} */
+.chart-legend {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-color.food {
+    background-color: #FF9E9E;
+}
+
+.legend-color.transport {
+    background-color: #FFD6A5;
+}
+
+.legend-color.activities {
+    background-color: #B5EAD7;
+}
+
+.legend-color.accommodation {
+    background-color: #A0C4FF;
+}
+
+.legend-color.other {
+    background-color: #D0AFFF;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5a4dcc;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--theme-light);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--theme-lighter);
+}
+
+.danger-btn {
+    background-color: var(--negative-color);
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #e63946;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+    font-style: italic;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-sm);
+    margin-top: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .trip-details-app {
+        padding: 1.5rem;
+    }
+
+    .trip-name {
+        font-size: 1.75rem;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .tab-pane-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .expense-list-item {
+        gap: 1rem;
+    }
+
+    .summary-stats-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .trip-details-app {
+        padding: 1rem;
+    }
+
+    .expense-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .expense-amount {
+        align-self: flex-end;
+    }
+
+    .amount_arrow {
+        margin-top: 10px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .transaction-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .mark-paid-btn {
+        align-self: flex-end;
+    }
+
+    .chart-placeholder {
+        flex-direction: column;
+    }
+
+    .chart-legend {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

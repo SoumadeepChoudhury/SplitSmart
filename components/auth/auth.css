@@ -1,0 +1,140 @@
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 1rem;
+}
+
+.auth-box {
+    background-color: white;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+}
+
+.logo {
+    width: 80px;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    color: #444;
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+}
+
+.email-input {
+    color: black;
+    background-color: white;
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    outline: none;
+}
+
+.email-input:focus {
+    border-color: #41467d;
+}
+
+.continue-btn {
+    background-color: #41467d;
+    color: white;
+    font-weight: bold;
+    padding: 0.8rem;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background 0.3s ease;
+}
+
+.continue-btn:hover {
+    background-color: #1e557f;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #888;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ddd;
+}
+
+.divider span {
+    margin: 0 0.75rem;
+    font-size: 0.85rem;
+}
+
+.provider-btn {
+    color: black;
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0);
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.provider-btn img {
+    width: 20px;
+}
+
+.provider-btn:hover {
+    background: #f2f2f2;
+}
+
+.login-link {
+    margin-top: 1.2rem;
+    font-size: 0.85rem;
+}
+
+.login-link a {
+    color: #454a82;
+    text-decoration: none;
+    font-weight: bolder;
+}
+
+.footer-links {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.footer-links a {
+    color: inherit;
+    text-decoration: none;
+}

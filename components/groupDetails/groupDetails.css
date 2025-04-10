@@ -1,0 +1,491 @@
+/* styles/GroupDetails.module.css or globals.css */
+:root {
+    --theme-color: #1a1c31;
+    --theme-light: #2a2d4a;
+    --theme-lighter: #3a3d5a;
+    --card-bg: #2a2d4a;
+    --text-primary: #ffffff;
+    --text-secondary: #b8b9c5;
+    --accent-color: #6c5ce7;
+    --positive-color: #00e676;
+    --negative-color: #ff5252;
+    --upcoming-color: #40c4ff;
+    --border-radius: 16px;
+    --border-radius-sm: 8px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.25);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Group Details Page Styles */
+.group-details-app {
+    min-height: 100vh;
+    background-color: var(--theme-color);
+    color: var(--text-primary);
+    padding: 2rem;
+    margin-bottom: 50px;
+}
+
+.group-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Group Header */
+.group-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.group-header-avatar {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.8rem;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+    color: white;
+}
+
+.group-header-name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Tab Navigation */
+.group-tabs-nav {
+    display: flex;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: -2px;
+    transition: var(--transition);
+}
+
+.tab-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.tab-button:hover {
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.tab-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+    border-radius: var(--border-radius-sm);
+}
+
+/* Tab Content Panes */
+.tab-pane {
+    display: none;
+    padding: 1rem 0;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.tab-pane h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tab-pane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tab-pane-header h2 {
+    margin-bottom: 0;
+}
+
+/* General List Styles */
+.content-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item {
+    background-color: var(--card-bg);
+    padding: 1.25rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 0.75rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+}
+
+.list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Trip List Specifics */
+.trip-list-item {
+    cursor: pointer;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.trip-list-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: var(--accent-color);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.trip-list-item:hover::after {
+    opacity: 1;
+}
+
+.trip-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: rgba(108, 92, 231, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    color: var(--accent-color);
+}
+
+.trip-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.trip-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.trip-name {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.trip-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.trip-arrow {
+    color: var(--text-secondary);
+    margin-left: 1rem;
+}
+
+.trip-arrow svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Member List Specifics */
+.member-list-item {
+    justify-content: space-between;
+}
+
+.member-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    color: white;
+}
+
+.member-details {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.member-name {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.member-email {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.member-role {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 1rem;
+    margin-left: 1rem;
+    color: white;
+    background-color: var(--theme-light);
+}
+
+.member-role.admin {
+    background-color: var(--accent-color);
+}
+
+/* Settings Tab Specifics */
+.setting-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.setting-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.edit-name-form,
+.name-display {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.edit-name-form input[type="text"] {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    background-color: var(--theme-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.edit-name-form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+}
+
+.name-display {
+    justify-content: space-between;
+}
+
+.name-display span {
+    font-size: 1.1rem;
+}
+
+.edit-photo-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.current-photo-preview .group-header-avatar {
+    width: 5rem;
+    height: 5rem;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.delete-group-section p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.delete-group-section small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5a4dcc;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--theme-light);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--theme-lighter);
+}
+
+.danger-btn {
+    background-color: var(--negative-color);
+    color: white;
+}
+
+.danger-btn:hover {
+    background-color: #e63946;
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .group-details-app {
+        padding: 1.5rem;
+    }
+
+    .group-header {
+        gap: 1rem;
+    }
+
+    .group-header-avatar {
+        width: 4rem;
+        height: 4rem;
+        font-size: 1.5rem;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+
+    .group-header-name {
+        font-size: 1.70rem;
+        margin-bottom: 10px;
+    }
+
+    .group-tabs-nav {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .tab-pane-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .edit-name-form,
+    .name-display {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .edit-photo-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    .group-details-app {
+        padding: 1rem;
+    }
+
+    .list-item {
+        padding: 1rem;
+    }
+
+    .trip-icon,
+    .member-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+        margin-right: 0.75rem;
+    }
+
+    .trip-name,
+    .member-name {
+        font-size: 0.95rem;
+    }
+
+    .trip-date,
+    .member-email {
+        font-size: 0.8rem;
+    }
+}
