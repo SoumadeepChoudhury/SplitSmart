@@ -1,14 +1,100 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import './groupDetails.css';
+import { db } from '@/firebase';
+import { get, ref, remove, update } from 'firebase/database';
+import { useUserContext } from '@/context/UserContext';
+import colors from '@/utils/colors';
+import Spinner from '@/utils/spinner/spinner';
 
-export default function GroupDetails() {
+export default function GroupDetails({ group, goBack, onTripClick }) {
+    const { user, myData } = useUserContext();
     const [activeTab, setActiveTab] = useState('trips');
-    const [groupName, setGroupName] = useState('Goa 2024');
+    const [groupName, setGroupName] = useState(group?.name);
     const [editGroupName, setEditGroupName] = useState(groupName);
     const [isEditingName, setIsEditingName] = useState(false);
+    const [membersInfo, setMembersInfo] = useState([]);
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [copyText, setCopyText] = useState('Copy');
+    const [_group, set_Group] = useState(group);
+
+    let link = 'Loading...';
+
+    const tripNameRef = useRef(null);
+    const startDateRef = useRef(null);
+    const endDateRef = useRef(null);
+
+    //Handling date change so that the end date is always after the start date.
+    useEffect(() => {
+        const handleStartDateChange = () => {
+            const startDate = startDateRef.current.value;
+            if (endDateRef.current) {
+                endDateRef.current.min = startDate;
+            }
+        };
+        const startInput = startDateRef.current;
+        if (startInput) {
+            startInput.addEventListener('change', handleStartDateChange);
+        }
+
+        return () => {
+            if (startInput) {
+                startInput.removeEventListener('change', handleStartDateChange);
+            }
+        };
+    }, [showCreateForm]);
+
+    useEffect(() => {
+        const fetchMembers = async () => {
+            const tempGrpMembers = myData.groups.filter((grp) => grp.id === group.id)[0];
+            group = tempGrpMembers;
+            if (group === undefined) goBack();
+            if (!group) return
+            set_Group(group);
+            setGroupName(group?.name);
+            const memberDetails = [];
+
+            for (const member of group?.members) {
+                if (member === user.uid) {
+                    memberDetails.push({
+                        uid: user.uid,
+                        name: myData.name,
+                        email: myData.email,
+                        photoURL: myData.photoURL,
+                        isCurrentUser: true,
+                        isAdmin: group?.createdBy === member,
+                        color: colors[parseInt(Math.random() * 10)]
+                    });
+                } else {
+                    try {
+                        const snapshot = await get(ref(db, `users/${member}`));
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            memberDetails.push({
+                                uid: member,
+                                name: data.name,
+                                email: data.email,
+                                photoURL: data.photoURL,
+                                isCurrentUser: false,
+                                isAdmin: group?.createdBy === member,
+                                color: colors[parseInt(Math.random() * 10)]
+                            });
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching data for ${member}:`, error);
+                    }
+                }
+            }
+
+            setMembersInfo([...memberDetails]);
+        };
+
+        fetchMembers();
+    }, [myData, group?.members, group?.createdBy, user.uid]);
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -16,9 +102,134 @@ export default function GroupDetails() {
 
     const handleEditNameSubmit = (e) => {
         e.preventDefault();
-        setGroupName(editGroupName);
+        if (group.members.includes(user.uid)) {
+            update(ref(db, `users/${group.createdBy}/groups/${group.id}`), {
+                name: editGroupName,
+            }).then(() => {
+                setGroupName(editGroupName);
+            }).catch((error) => {
+                console.error('Error updating group name:', error);
+            });
+        }
         setIsEditingName(false);
     };
+
+    function getDate(date) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString(undefined, options);
+    }
+
+    function createTripId(tripName) {
+        //user+grp+trip+time
+        let _tripId = '';
+        //user name
+        const _unameArray = myData.name.split(' ');
+        let _uname = '';
+        for (let index = 0; index < _unameArray.length; index++) {
+            const word = _unameArray[index];
+            _uname += word.charAt(0).toLowerCase();
+        }
+        //group name
+        const _grpNameArray = group.name.split(' ');
+        let _grpName = '';
+        for (let index = 0; index < _grpNameArray.length; index++) {
+            const word = _grpNameArray[index];
+            _grpName += word.charAt(0).toLowerCase();
+        }
+        //trip name
+        const _tripNameArray = tripName.split(' ');
+        let _tripName = '';
+        for (let index = 0; index < _tripNameArray.length; index++) {
+            const word = _tripNameArray[index];
+            _tripName += word.charAt(0).toLowerCase();
+        }
+
+        _tripId = `${_uname}${_grpName}${_tripName}${Date.now()}`;
+        return _tripId;
+    }
+
+    //handling create trip form
+    const handleCreateTrip = async (e) => {
+        e.preventDefault();
+
+        setIsLoading(true);
+
+        // Validate dates
+        const startDate = new Date(startDateRef.current.value);
+        const endDate = new Date(endDateRef.current.value);
+
+
+        if (!tripNameRef.current.value.trim()) {
+            console.log('Trip name is required');
+            return;
+        }
+
+        if (!startDateRef.current.value) {
+            console.log('Start date is required');
+            return;
+        }
+
+        if (!endDateRef.current.value) {
+            console.log('End date is required');
+            return;
+        } else if (endDate < startDate) {
+            console.log('End date must be after start date');
+            return;
+        }
+
+        try {
+            const tripId = createTripId(tripNameRef.current.value?.trim());
+            const tripData = {
+                name: tripNameRef.current.value?.trim(),
+                startDate: getDate(new Date(startDateRef.current.value)),
+                endDate: getDate(new Date(endDateRef.current.value)),
+                createdBy: user.uid,
+                createdAt: getDate(new Date()),
+            };
+
+            update(ref(db, `users/${group.createdBy}/groups/${group.id}/trips/${tripId}`), tripData).then(() => {
+                console.log('Trip created successfully');
+                setShowCreateForm(false);
+                setIsLoading(false);
+                update(ref(db, `users/${group.createdBy}/groups/${group.id}`), { recentActivity: `Trip: ${tripData.name} has been created in ${group.name} group.` })
+            });
+
+        } catch (error) {
+            console.log('Error creating trip:', error);
+        }
+    };
+
+    function handleDeleteGroup() {
+        remove(ref(db, `invites/${group.token}`)).then(() => { console.log('Cleaned') })
+        update(ref(db, `users/${group.createdBy}/groups/${group.id}`), { recentActivity: `Group: ${group.name} is deleted by ${myData.name}.` })
+        remove(ref(db, `users/${group.createdBy}/groups/${group.id}`)).then(() => {
+            group = null;
+            goBack();
+        })
+    }
+
+    const handleCopy = async () => {
+        try {
+            const permissionStatus = await navigator.permissions.query({ name: 'clipboard-write' });
+
+            if (permissionStatus.state === 'granted' || permissionStatus.state === 'prompt') {
+                await navigator.clipboard.writeText(link);
+                setCopyText("Copied!");
+            } else {
+                alert('Clipboard access denied.');
+            }
+        } catch (err) {
+            console.error('Clipboard error:', err);
+        }
+    };
+
+    function getLink() {
+        //Create a link with the unique id of the group, i.e., groupId
+        const fullUrl = typeof window !== 'undefined' ? window.location.href : '';
+        link = fullUrl + "join/group/" + group.token;
+
+        return link !== 'Loading...' ? link : null;
+    }
 
     return (
         <div className="group-details-app">
@@ -26,11 +237,22 @@ export default function GroupDetails() {
                 <title>{groupName} | Group Details</title>
             </Head>
 
+            {/* Add this back button */}
+            <button
+                className="elegant-back-button"
+                onClick={goBack}
+                aria-label="Go back"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clipRule="evenodd" />
+                </svg>
+            </button>
+
             <div className="group-details-container">
                 {/* Group Header */}
                 <div className="group-header">
                     <div className="group-header-avatar" aria-hidden="true" style={{ backgroundColor: '#FF9E9E' }}>
-                        G
+                        {group?.initial}
                     </div>
                     <h1 className="group-header-name">{groupName}</h1>
                 </div>
@@ -88,67 +310,118 @@ export default function GroupDetails() {
                     >
                         <div className="tab-pane-header">
                             <h2>Trips</h2>
-                            <button className="btn btn-primary new-trip-btn">
+                            <button className="btn btn-primary new-trip-btn" onClick={() => {
+                                setShowCreateForm(true);
+                                setTimeout(() => {
+                                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                }, 100);
+                            }
+                            }>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                     <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
                                 </svg>
                                 New Trip
                             </button>
                         </div>
-                        <ul className="content-list trip-list">
-                            <li className="list-item trip-list-item" tabIndex={0} role="button">
+
+                        {/* Trip List */}
+                        {Object.keys(_group.trips).length > 0 ? (<ul className="content-list trip-list"> {Object.entries(_group.trips).map(([tripId, tripDetailsObject]) => {
+
+                            return (<li key={tripId} className="list-item trip-list-item" tabIndex={0} role="button" onClick={() => onTripClick([group, tripId, tripDetailsObject, membersInfo])} >
                                 <div className="trip-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                         <path fillRule="evenodd" d="M8.161 2.58a1.875 1.875 0 011.678 0l4.993 2.498c.106.052.23.052.336 0l3.869-1.935A1.875 1.875 0 0121.75 4.82v12.485c0 .71-.401 1.36-1.037 1.677l-4.875 2.437a1.875 1.875 0 01-1.676 0l-4.994-2.497a.375.375 0 00-.336 0l-3.868 1.935A1.875 1.875 0 012.25 19.18V6.695c0-.71.401-1.36 1.036-1.677l4.875-2.437zM9 6a.75.75 0 01.75.75V15a.75.75 0 01-1.5 0V6.75A.75.75 0 019 6zm6.75 3a.75.75 0 00-1.5 0v8.25a.75.75 0 001.5 0V9z" clipRule="evenodd" />
                                     </svg>
                                 </div>
                                 <div className="trip-details">
-                                    <span className="trip-name">Goa 2024 Winter Trip</span>
-                                    <span className="trip-date">Dec 15-20, 2024</span>
+                                    <span className="trip-name">{tripDetailsObject.name}</span>
+                                    <span className="trip-date">{tripDetailsObject.startDate}</span>
                                 </div>
                                 <div className="trip-arrow">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                         <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clipRule="evenodd" />
                                     </svg>
                                 </div>
-                            </li>
-                            <li className="list-item trip-list-item" tabIndex={0} role="button">
-                                <div className="trip-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fillRule="evenodd" d="M8.161 2.58a1.875 1.875 0 011.678 0l4.993 2.498c.106.052.23.052.336 0l3.869-1.935A1.875 1.875 0 0121.75 4.82v12.485c0 .71-.401 1.36-1.037 1.677l-4.875 2.437a1.875 1.875 0 01-1.676 0l-4.994-2.497a.375.375 0 00-.336 0l-3.868 1.935A1.875 1.875 0 012.25 19.18V6.695c0-.71.401-1.36 1.036-1.677l4.875-2.437zM9 6a.75.75 0 01.75.75V15a.75.75 0 01-1.5 0V6.75A.75.75 0 019 6zm6.75 3a.75.75 0 00-1.5 0v8.25a.75.75 0 001.5 0V9z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="trip-details">
-                                    <span className="trip-name">Manali 2025 Summer Expedition</span>
-                                    <span className="trip-date">Jun 10-20, 2025</span>
-                                </div>
-                                <div className="trip-arrow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </li>
-                            <li className="list-item trip-list-item" tabIndex={0} role="button">
-                                <div className="trip-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fillRule="evenodd" d="M8.161 2.58a1.875 1.875 0 011.678 0l4.993 2.498c.106.052.23.052.336 0l3.869-1.935A1.875 1.875 0 0121.75 4.82v12.485c0 .71-.401 1.36-1.037 1.677l-4.875 2.437a1.875 1.875 0 01-1.676 0l-4.994-2.497a.375.375 0 00-.336 0l-3.868 1.935A1.875 1.875 0 012.25 19.18V6.695c0-.71.401-1.36 1.036-1.677l4.875-2.437zM9 6a.75.75 0 01.75.75V15a.75.75 0 01-1.5 0V6.75A.75.75 0 019 6zm6.75 3a.75.75 0 00-1.5 0v8.25a.75.75 0 001.5 0V9z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="trip-details">
-                                    <span className="trip-name">Local Weekend Getaway</span>
-                                    <span className="trip-date">Aug 5-7, 2024</span>
-                                </div>
-                                <div className="trip-arrow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </li>
-                        </ul>
-                        <p className="empty-state" style={{ display: 'none' }}>
-                            No trips added to this group yet.
-                        </p>
+                            </li>)
+
+                        })}</ul>) : (
+                            !showCreateForm ? <div className="no-groups-message">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path fillRule="evenodd" d="M6.912 3a3 3 0 00-2.868 2.118l-2.411 7.838a3 3 0 00-.133.882V18a3 3 0 003 3h15a3 3 0 003-3v-4.162c0-.299-.045-.596-.133-.882l-2.412-7.838A3 3 0 0017.088 3H6.912zm13.823 9.75l-2.213-7.191A1.5 1.5 0 0017.088 4.5H6.912a1.5 1.5 0 00-1.434 1.059L3.265 12.75H6.11a3 3 0 012.684 1.658l.256.513a1.5 1.5 0 001.342.829h3.218a1.5 1.5 0 001.342-.83l.256-.512a3 3 0 012.684-1.658h2.844z" clipRule="evenodd" />
+                                </svg>
+                                <p>No Trips found</p>
+                            </div> : null)}
                     </div>
+
+
+                    {/* Create Trip Form */}
+                    {showCreateForm ? <section className="create-trip-form-section" id="create-trip-form">
+                        <div className="form-header">
+                            <h2>Create New Trip</h2>
+                            <button
+                                className="close-form-btn"
+                                onClick={() => setShowCreateForm(false)}
+                                aria-label="Close form"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form id="new-trip-form" onSubmit={handleCreateTrip}>
+                            <div className="form-group">
+                                <label htmlFor="trip-name">Trip Name:</label>
+                                <input
+                                    type="text"
+                                    id="trip-name"
+                                    name="tripName"
+                                    required
+                                    placeholder="Enter trip name"
+                                    ref={tripNameRef}
+                                />
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="start-date">Start Date:</label>
+                                    <input
+                                        type="date"
+                                        id="start-date"
+                                        name="startDate"
+                                        required
+                                        min={new Date().toISOString().split('T')[0]}
+                                        ref={startDateRef}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="end-date">End Date:</label>
+                                    <input
+                                        type="date"
+                                        id="end-date"
+                                        name="endDate"
+                                        required
+                                        min={new Date().toISOString().split('T')[0]}
+                                        ref={endDateRef}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-actions">
+                                <button type="submit" className="btn btn-primary">
+                                    Create Trip
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowCreateForm(false)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </section> : null}
 
                     {/* Members Tab */}
                     <div
@@ -159,51 +432,29 @@ export default function GroupDetails() {
                     >
                         <div className="tab-pane-header">
                             <h2>Members</h2>
-                            <button className="btn btn-secondary invite-members-btn">
+                            <button className="btn btn-secondary invite-members-btn" onClick={() => setShowOverlay(true)}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
                                 </svg>
                                 Invite / Share Link
                             </button>
                         </div>
+                        {/* Get the members list and fetch the name and email of the members from the uid */}
                         <ul className="content-list member-list">
-                            <li className="list-item member-list-item">
-                                <div className="member-avatar" aria-hidden="true" style={{ backgroundColor: '#9EC5FF' }}>
-                                    A
-                                </div>
-                                <div className="member-details">
-                                    <span className="member-name">Amit Singh (You)</span>
-                                    <span className="member-email">amit@example.com</span>
-                                </div>
-                                <span className="member-role admin">Admin</span>
-                            </li>
-                            <li className="list-item member-list-item">
-                                <div className="member-avatar" aria-hidden="true" style={{ backgroundColor: '#FFD6A5' }}>
-                                    P
-                                </div>
-                                <div className="member-details">
-                                    <span className="member-name">Priya Sharma</span>
-                                    <span className="member-email">priya@example.com</span>
-                                </div>
-                            </li>
-                            <li className="list-item member-list-item">
-                                <div className="member-avatar" aria-hidden="true" style={{ backgroundColor: '#CAFFBF' }}>
-                                    R
-                                </div>
-                                <div className="member-details">
-                                    <span className="member-name">Rahul Verma</span>
-                                    <span className="member-email">rahul@example.com</span>
-                                </div>
-                            </li>
-                            <li className="list-item member-list-item">
-                                <div className="member-avatar" aria-hidden="true" style={{ backgroundColor: '#BDB2FF' }}>
-                                    S
-                                </div>
-                                <div className="member-details">
-                                    <span className="member-name">Sneha Patil</span>
-                                    <span className="member-email">sneha@example.com</span>
-                                </div>
-                            </li>
+                            {
+                                membersInfo.map((member) => (
+                                    <li className="list-item member-list-item" key={member.uid}>
+                                        {member.photoURL === '' ? (<div className="member-avatar" aria-hidden="true" style={{ backgroundColor: `${member.color}` }}>
+                                            {member.name.charAt(0).toUpperCase()}
+                                        </div>) : (<img src={member.photoURL} alt="User Avatar" className="member-avatar" referrerPolicy='no-referrer' />)}
+                                        <div className="member-details">
+                                            <span className="member-name">{member.name} {member.isCurrentUser ? '(You)' : null}</span>
+                                            <span className="member-email">{member.email}</span>
+                                        </div>
+                                        {member.isAdmin ? <span className="member-role admin">Admin</span> : null}
+                                    </li>
+                                ))
+                            }
                         </ul>
                     </div>
 
@@ -253,35 +504,43 @@ export default function GroupDetails() {
                                 </div>
                             )}
                         </section>
-
-                        <section className="setting-section">
-                            <h3>Group Photo</h3>
-                            <div className="edit-photo-section">
-                                <div className="current-photo-preview">
-                                    <div className="group-header-avatar" aria-hidden="true" style={{ backgroundColor: '#FF9E9E' }}>
-                                        G
-                                    </div>
-                                </div>
-                                <div className="photo-actions">
-                                    <label htmlFor="group-photo-upload" className="btn btn-secondary">
-                                        Upload New Photo
-                                    </label>
-                                    <input type="file" id="group-photo-upload" accept="image/*" style={{ display: 'none' }} />
-                                </div>
-                            </div>
-                        </section>
-
-                        <section className="setting-section delete-group-section">
-                            <h3>Danger Zone</h3>
-                            <p>Deleting the group will permanently remove all associated trips and expenses for all members.</p>
-                            <button className="btn danger-btn delete-group-btn">
-                                Delete Group
-                            </button>
-                            <small>(Only group admins can perform this action)</small>
-                        </section>
+                        {group.createdBy === user.uid &&
+                            <section className="setting-section delete-group-section">
+                                <h3>Danger Zone</h3>
+                                <p>Deleting the group will permanently remove all associated trips and expenses for all members.</p>
+                                <button className="btn danger-btn delete-group-btn" onClick={handleDeleteGroup}>
+                                    Delete Group
+                                </button>
+                                <small>(Only group admins can perform this action)</small>
+                            </section>
+                        }
                     </div>
                 </div>
             </div>
+            {isLoading && <Spinner size={40} />}
+            {showOverlay && (
+                <div className="overlay-backdrop">
+                    <div className="overlay-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.644 1.59a.75.75 0 01.712 0l9.75 5.25a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.712 0l-9.75-5.25a.75.75 0 010-1.32l9.75-5.25z" />
+                            <path d="M3.265 10.602l7.668 4.129a2.25 2.25 0 002.134 0l7.668-4.13 1.37.739a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.71 0l-9.75-5.25a.75.75 0 010-1.32l1.37-.738z" />
+                            <path d="M10.933 19.231l-7.668-4.13-1.37.739a.75.75 0 000 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 000-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 01-2.134-.001z" />
+                        </svg>
+                        <p>Group created! Share this link to invite members:</p>
+                        <div className="link-container">
+                            <input type="text" value={getLink() || link} readOnly />
+                            <button onClick={handleCopy}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7.5 3.375c0-1.036.84-1.875 1.875-1.875h.375a3.75 3.75 0 013.75 3.75v1.875C13.5 8.161 14.34 9 15.375 9h1.875A3.75 3.75 0 0121 12.75v3.375C21 17.16 20.16 18 19.125 18h-9.75A1.875 1.875 0 017.5 16.125V3.375z" />
+                                    <path d="M15 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0017.25 7.5h-1.875A.375.375 0 0115 7.125V5.25zM4.875 6H6v10.125A3.375 3.375 0 009.375 19.5H16.5v1.125c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 013 20.625V7.875C3 6.839 3.84 6 4.875 6z" />
+                                </svg>
+                                {copyText}
+                            </button>
+                        </div>
+                        <button className="close-btn" onClick={() => setShowOverlay(false)}>Close</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

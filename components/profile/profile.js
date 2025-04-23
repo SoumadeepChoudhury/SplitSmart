@@ -1,21 +1,56 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import './profile.css';
+import { signOut } from 'firebase/auth';
+import { auth, db } from '@/firebase';
+import LoadingScreen from '@/utils/loading/loading';
+import { useUserContext } from '@/context/UserContext';
+import { ref, update } from 'firebase/database';
 
 export default function Profile() {
+    const { user, setUser, setCurrentTab, myData } = useUserContext();
+
+
     const [darkMode, setDarkMode] = useState(true);
     const [currency, setCurrency] = useState('INR');
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [editMode, setEditMode] = useState(false);
-    const [userName, setUserName] = useState('Alex Johnson');
+    const [userName, setUserName] = useState(myData.name);
     const [tempName, setTempName] = useState(userName);
-    const [userEmail] = useState('alex.johnson@example.com');
+    const [userEmail] = useState(myData.email);
+    const [totalGrps, setTotalGrps] = useState(myData.groups?.length);
+
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    useEffect(() => { setTotalGrps(myData.groups?.length) }, [myData]);
+
 
     const handleSaveProfile = () => {
         setUserName(tempName);
+
+        //updating database
+        update(ref(db, `users/${user.uid}`), {
+            name: tempName,
+        }).then(() => {
+            console.log("Data updated successfully");
+        }
+        ).catch((error) => {
+            console.error("Error updating data: ", error);
+        });
         setEditMode(false);
     };
+
+    const logout = () => {
+        setIsLoggingOut(true);
+        setTimeout(() => {
+            signOut(auth).catch((error) => {
+                setIsLoggingOut(false);
+                setUser(null);
+                setCurrentTab(null);
+                console.log(error);
+            });
+        }, 2000);
+    }
 
     return (
         <div className="profile-app">
@@ -26,7 +61,7 @@ export default function Profile() {
             <div className="profile-page-container">
                 {/* Profile Info Section */}
                 <section className="profile-section profile-info-section">
-                    <div className="profile-avatar" aria-label="User Avatar" style={{ backgroundColor: '#6c5ce7' }}>
+                    {!myData.photoURL ? (<div className="profile-avatar" aria-label="User Avatar" style={{ backgroundColor: '#6c5ce7' }}>
                         <span>A</span>
                         <button className="edit-avatar-btn" aria-label="Edit profile picture">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -34,7 +69,7 @@ export default function Profile() {
                                 <path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z" />
                             </svg>
                         </button>
-                    </div>
+                    </div>) : <img src={myData.photoURL} alt="User Avatar" referrerPolicy="no-referrer" className="profile-avatar" />}
                     <div className="profile-user-details">
                         {editMode ? (
                             <div className="edit-name-container">
@@ -79,13 +114,13 @@ export default function Profile() {
                     <div className="stats-grid">
                         <div className="stat-card">
                             <div className="stat-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4f6af5">
+                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V18c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-1.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05.02.01.03.03.04.04 1.14.83 1.93 1.94 1.93 3.41V18c0 .35-.07.69-.2 1H22c.55 0 1-.45 1-1v-1.5c0-2.33-4.67-3.5-7-3.5z" />
                                 </svg>
                             </div>
                             <div className="stat-content">
-                                <p className="stat-label">Lifetime Spending</p>
-                                <p className="stat-value">₹1,25,300.00</p>
+                                <p className="stat-label">Total Groups</p>
+                                <p className="stat-value">{totalGrps}</p>
                             </div>
                         </div>
                         <div className="stat-card">
@@ -98,18 +133,12 @@ export default function Profile() {
                             <div className="stat-content">
                                 <p className="stat-label">Most Frequent Groups</p>
                                 <ul className="frequent-groups-list">
-                                    <li>
-                                        <span className="group-badge" style={{ backgroundColor: '#FF9E9E' }}>G</span>
-                                        Goa 2024
-                                    </li>
-                                    <li>
-                                        <span className="group-badge" style={{ backgroundColor: '#9EC5FF' }}>O</span>
-                                        Office Lunch Group
-                                    </li>
-                                    <li>
-                                        <span className="group-badge" style={{ backgroundColor: '#CAFFBF' }}>F</span>
-                                        Flatmates
-                                    </li>
+                                    {myData.groups?.slice(0, 3).map((group, index) =>
+                                        <li key={index}>
+                                            <span className="group-badge" style={{ backgroundColor: group.color }}>{group.initial}</span>
+                                            <span className='gName'>{group.name}</span>
+                                        </li>
+                                    )}
                                 </ul>
                             </div>
                         </div>
@@ -135,8 +164,8 @@ export default function Profile() {
                                 </div>
                                 <label htmlFor="dark-mode-toggle" className="setting-label">Dark Mode</label>
                             </div>
-                            <div className="setting-control">
-                                <label className="toggle-switch" aria-label="Toggle Dark Mode">
+                            <div className="setting-control toggle-wrapper">
+                                <label className="toggle-switch disabled" aria-label="Toggle Dark Mode">
                                     <input
                                         type="checkbox"
                                         id="dark-mode-toggle"
@@ -146,6 +175,7 @@ export default function Profile() {
                                     />
                                     <span className="toggle-slider"></span>
                                 </label>
+                                <span className="tooltip-text">Coming soon...</span>
                             </div>
                         </li>
 
@@ -167,33 +197,7 @@ export default function Profile() {
                                     onChange={(e) => setCurrency(e.target.value)}
                                 >
                                     <option value="INR">INR (₹)</option>
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="GBP">GBP (£)</option>
                                 </select>
-                            </div>
-                        </li>
-
-                        <li className="setting-option">
-                            <div className="setting-info">
-                                <div className="setting-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <label htmlFor="notification-toggle" className="setting-label">Push Notifications</label>
-                            </div>
-                            <div className="setting-control">
-                                <label className="toggle-switch" aria-label="Toggle Push Notifications">
-                                    <input
-                                        type="checkbox"
-                                        id="notification-toggle"
-                                        className="toggle-checkbox"
-                                        checked={notificationsEnabled}
-                                        onChange={() => setNotificationsEnabled(!notificationsEnabled)}
-                                    />
-                                    <span className="toggle-slider"></span>
-                                </label>
                             </div>
                         </li>
                     </ul>
@@ -201,13 +205,14 @@ export default function Profile() {
 
                 {/* Actions Section */}
                 <section className="profile-section profile-actions-section">
-                    <button className="btn danger-btn logout-btn">
+                    <button className="btn danger-btn logout-btn" onClick={logout}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                             <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 006 5.25v13.5a1.5 1.5 0 001.5 1.5h6a1.5 1.5 0 001.5-1.5V15a.75.75 0 011.5 0v3.75a3 3 0 01-3 3h-6a3 3 0 01-3-3V5.25a3 3 0 013-3h6a3 3 0 013 3V9A.75.75 0 0115 9V5.25a1.5 1.5 0 00-1.5-1.5h-6zm3.97 4.72a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.72-1.72H1.5a.75.75 0 010-1.5h11.69l-1.72-1.72a.75.75 0 010-1.06z" clipRule="evenodd" />
                         </svg>
                         Logout
                     </button>
                 </section>
+                {isLoggingOut ? <LoadingScreen isLogout={true} /> : null}
             </div>
         </div>
     );

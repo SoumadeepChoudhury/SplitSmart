@@ -29,6 +29,35 @@
 .group-details-container {
     max-width: 1200px;
     margin: 0 auto;
+    margin-top: 30px;
+}
+
+.elegant-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.elegant-back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-2px);
+}
+
+.elegant-back-button svg {
+    width: 20px;
+    height: 20px;
+    color: white;
 }
 
 /* Group Header */
@@ -229,6 +258,57 @@
     height: 1.25rem;
 }
 
+/* Create Trip Form */
+.create-trip-form-section {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Date input styling */
+input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0.75rem 1rem;
+    background-color: var(--theme-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+input[type="date"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+}
+
+/* Custom calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: 1;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+/* Hover state for better interactivity */
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
 /* Member List Specifics */
 .member-list-item {
     justify-content: space-between;
@@ -408,6 +488,122 @@
     font-style: italic;
 }
 
+.no-groups-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.no-groups-message svg {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+.no-groups-message p {
+    color: var(--text-secondary);
+}
+
+.overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.overlay-content {
+    background: var(--theme-color);
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: scaleUp 0.3s ease;
+}
+
+.overlay-content svg {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 1rem;
+}
+.overlay-content p {
+    color: var(--text-primary);
+}
+
+.link-container {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.link-container input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.link-container button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #6c5ce7;
+    color: var(--text-primary);
+    padding: 0.2rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.link-container button svg{
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.close-btn {
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    background: var(--theme-lighter) !important;
+    border: none;
+    color: #555;
+    font-size: 1rem !important;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.9);
+        opacity: 0
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .group-details-app {
@@ -463,8 +659,13 @@
 @media (max-width: 480px) {
 
 
+
     .group-details-app {
         padding: 1rem;
+    }
+
+    .group-details-container {
+        margin-top: 50px;
     }
 
     .list-item {

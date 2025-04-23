@@ -50,6 +50,10 @@ p {
     border-color: #41467d;
 }
 
+.error {
+    border-color: #ff0000;
+}
+
 .continue-btn {
     background-color: #41467d;
     color: white;

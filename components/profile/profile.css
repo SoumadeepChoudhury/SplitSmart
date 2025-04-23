@@ -248,6 +248,14 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.95rem;
+
+}
+
+.frequent-groups-list li .gName {
+    max-width: 13rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .group-badge {
@@ -342,6 +350,12 @@
     transition: var(--transition);
 }
 
+
+.toggle-switch.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -364,6 +378,55 @@
 
 .toggle-checkbox:focus-visible+.toggle-slider {
     box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.5);
+}
+
+.toggle-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-text {
+    width: 10rem;
+    visibility: hidden;
+    opacity: 0;
+    background-color: rgba(40, 42, 60, 0.95);
+    color: #fff;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 140%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    font-size: 13px;
+    font-weight: 400;
+    /* line-height: 1.4; */
+    transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: normal;
+}
+
+.tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(40, 42, 60, 0.95) transparent transparent transparent;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+    transition: all 0.25s ease;
+}
+
+/* Show with smooth animation */
+.toggle-wrapper:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Currency Select */

@@ -1,29 +1,131 @@
 'use client';
+import { get, ref, set } from 'firebase/database';
 import './groups.css'
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { db } from '@/firebase';
+import { useUserContext } from '@/context/UserContext';
 
-export default function Groups() {
+import { v4 as uuidv4 } from 'uuid';
+import Spinner from '@/utils/spinner/spinner';
+
+export default function Groups({ onGroupClick }) {
+    const { user, myData } = useUserContext();
+
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showShareLink, setShowShareLink] = useState(false);
     const [sortOption, setSortOption] = useState('recent');
     const [searchQuery, setSearchQuery] = useState('');
+    const [link, setLink] = useState('Loading...');
+    const [copyText, setCopyText] = useState('Copy');
+    const [isLoading, setIsLoading] = useState(false);
+    const token = uuidv4();
 
-    const groups = [
-        { id: 1, name: 'Goa 2024', members: 5, activeTrips: 1, initial: 'G', color: '#FF9E9E' },
-        { id: 2, name: 'Weekend Getaway', members: 3, activeTrips: 0, initial: 'W', color: '#9EC5FF' },
-        { id: 3, name: 'Office Lunch Group', members: 12, activeTrips: 2, initial: 'O', color: '#FFD6A5' },
-        { id: 4, name: 'Flatmates', members: 4, activeTrips: 0, initial: 'F', color: '#CAFFBF' },
-    ];
+    let groups = myData.groups || [];
+
+    useEffect(() => {
+        groups = myData.groups || [];
+    }, [myData]);
+
+
+    const groupName = useRef(null);
+    const groupDescription = useRef(null);
+    const groupCurrency = useRef(null);
+
+    const handleCopy = async () => {
+        try {
+            const permissionStatus = await navigator.permissions.query({ name: 'clipboard-write' });
+
+            if (permissionStatus.state === 'granted' || permissionStatus.state === 'prompt') {
+                await navigator.clipboard.writeText(link);
+                setCopyText("Copied!");
+            } else {
+                alert('Clipboard access denied.');
+            }
+        } catch (err) {
+            console.error('Clipboard error:', err);
+        }
+    };
+
+
+    function createGroupId(name) {
+        const _groupNameArray = name.split(' ');
+        let _grpId = '';
+        for (let index = 0; index < _groupNameArray.length; index++) {
+            const word = _groupNameArray[index];
+            if (word !== '') {
+                _grpId += word.charAt(0).toLowerCase();
+            }
+        }
+        const _unameArray = myData.name.split(' ');
+        let _uname = '';
+        for (let index = 0; index < _unameArray.length; index++) {
+            const word = _unameArray[index];
+            _uname += word.charAt(0).toLowerCase();
+        }
+        const groupId = _uname + _grpId + Date.now();
+        return groupId;
+    }
+
+    function getDate() {
+        const date = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString(undefined, options);
+    }
+
+    async function createLink(groupId) {
+        //Create a link with the unique id of the group, i.e., groupId
+        const fullUrl = typeof window !== 'undefined' ? window.location.href : '';
+        await set(ref(db, `invites/${token}`), {
+            groupId: groupId,
+            createdBy: user.uid,
+        });
+
+        return fullUrl + "join/group/" + token;
+    }
 
     const handleCreateGroup = (e) => {
         e.preventDefault();
+        setCopyText('Copy');
+        setLink('Loading...');
+        setIsLoading(true);
         // Form submission logic here
+        //upload in database
+        const groupId = createGroupId(groupName.current.value);
+        const _groupName = groupName.current.value;
+        const _groupDescription = groupDescription.current.value;
+        const _groupCurrency = groupCurrency.current.value;
+        set(ref(db, `users/${user.uid}/groups/${groupId}`), {
+            name: _groupName,
+            description: _groupDescription,
+            currency: _groupCurrency,
+            createdAt: getDate(),
+            createdBy: user.uid,
+            members: [user.uid],
+            token: token
+        }).then(() => {
+            setIsLoading(false);
+            console.log("Data uploaded successfully");
+        }
+        ).catch((error) => {
+            console.error("Error uploading data: ", error);
+        });
+
+
+        setShowCreateForm(false);
+        createLink(groupId).then((link) => {
+            setLink(link);
+        });
         setShowShareLink(true);
+        setTimeout(() => {
+            setShowShareLink(false);
+        }, 5000);
     };
 
-    const filteredGroups = groups.filter(group =>
-        group.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredGroups = groups?.filter(group => {
+        if (Object.keys(group).length > 0)
+            return group?.name.toLowerCase()?.includes(searchQuery.toLowerCase())
+    }
     );
 
     const sortedGroups = [...filteredGroups].sort((a, b) => {
@@ -31,6 +133,7 @@ export default function Groups() {
         if (sortOption === 'name_desc') return b.name.localeCompare(a.name);
         return 0; // Default to recent activity (original order)
     });
+
 
     return (
         <div className="groups-app">
@@ -85,6 +188,9 @@ export default function Groups() {
                         onClick={() => {
                             setShowCreateForm(true);
                             setShowShareLink(false);
+                            setTimeout(() => {
+                                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                            }, 100);
                         }}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -96,14 +202,16 @@ export default function Groups() {
 
                 {/* Group List */}
                 <section className="group-list" aria-label="List of your groups">
-                    {sortedGroups.length > 0 ? (
+                    {sortedGroups.length > 0 || showCreateForm ? (
                         sortedGroups.map((group) => (
+
                             <div
                                 key={group.id}
                                 className="group-list-item"
                                 tabIndex={0}
                                 role="button"
                                 aria-label={`View Group ${group.name}`}
+                                onClick={() => onGroupClick(group)}
                             >
                                 <div
                                     className="group-avatar"
@@ -113,12 +221,12 @@ export default function Groups() {
                                     {group.initial}
                                 </div>
                                 <div className="group-details">
-                                    <h3 className="group-item-name">{group.name}</h3>
-                                    <p className="group-item-members">{group.members} Members</p>
+                                    <h3 className="group-item-name">{group.name} (@{group.createrName})</h3>
+                                    <p className="group-item-members">{group.memberCount} {group.memberCount > 1 ? 'Members' : 'Member'}</p>
                                 </div>
-                                {group.activeTrips > 0 && (
+                                {group.activeTripsCount > 0 && (
                                     <span className="group-active-trips-badge">
-                                        {group.activeTrips} Trip{group.activeTrips !== 1 ? 's' : ''} Active
+                                        {group.activeTripsCount} Trip{group.activeTripsCount !== 1 ? 's' : ''} Active
                                     </span>
                                 )}
                             </div>
@@ -158,6 +266,7 @@ export default function Groups() {
                                     name="groupName"
                                     required
                                     placeholder="Enter group name"
+                                    ref={groupName}
                                 />
                             </div>
                             <div className="form-group">
@@ -167,15 +276,13 @@ export default function Groups() {
                                     name="groupDescription"
                                     rows={3}
                                     placeholder="Add a short description"
+                                    ref={groupDescription}
                                 />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="group-currency">Default Currency:</label>
-                                <select id="group-currency" name="groupCurrency" required>
+                                <select id="group-currency" name="groupCurrency" required ref={groupCurrency}>
                                     <option value="INR">INR (₹)</option>
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="GBP">GBP (£)</option>
                                 </select>
                             </div>
                             <div className="form-actions">
@@ -191,30 +298,32 @@ export default function Groups() {
                                 </button>
                             </div>
                         </form>
-
-                        {showShareLink && (
-                            <div className="shareable-link-display" id="shareable-link-area">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.644 1.59a.75.75 0 01.712 0l9.75 5.25a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.712 0l-9.75-5.25a.75.75 0 010-1.32l9.75-5.25z" />
-                                    <path d="M3.265 10.602l7.668 4.129a2.25 2.25 0 002.134 0l7.668-4.13 1.37.739a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.71 0l-9.75-5.25a.75.75 0 010-1.32l1.37-.738z" />
-                                    <path d="M10.933 19.231l-7.668-4.13-1.37.739a.75.75 0 000 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 000-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 01-2.134-.001z" />
-                                </svg>
-                                <p>Group created! Share this link to invite members:</p>
-                                <div className="link-container">
-                                    <input type="text" id="generated-link" value="https://app.example.com/group/join/abc123" readOnly />
-                                    <button id="copy-link-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M7.5 3.375c0-1.036.84-1.875 1.875-1.875h.375a3.75 3.75 0 013.75 3.75v1.875C13.5 8.161 14.34 9 15.375 9h1.875A3.75 3.75 0 0121 12.75v3.375C21 17.16 20.16 18 19.125 18h-9.75A1.875 1.875 0 017.5 16.125V3.375z" />
-                                            <path d="M15 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0017.25 7.5h-1.875A.375.375 0 0115 7.125V5.25zM4.875 6H6v10.125A3.375 3.375 0 009.375 19.5H16.5v1.125c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 013 20.625V7.875C3 6.839 3.84 6 4.875 6z" />
-                                        </svg>
-                                        Copy
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                     </section>
                 )}
+
+                {/* Show sharable link */}
+                {showShareLink && (
+                    <div className="shareable-link-display" id="shareable-link-area">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.644 1.59a.75.75 0 01.712 0l9.75 5.25a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.712 0l-9.75-5.25a.75.75 0 010-1.32l9.75-5.25z" />
+                            <path d="M3.265 10.602l7.668 4.129a2.25 2.25 0 002.134 0l7.668-4.13 1.37.739a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.71 0l-9.75-5.25a.75.75 0 010-1.32l1.37-.738z" />
+                            <path d="M10.933 19.231l-7.668-4.13-1.37.739a.75.75 0 000 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 000-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 01-2.134-.001z" />
+                        </svg>
+                        <p>Group created! Share this link to invite members:</p>
+                        <div className="link-container">
+                            <input type="text" id="generated-link" value={link} readOnly />
+                            <button id="copy-link-btn" onClick={handleCopy}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7.5 3.375c0-1.036.84-1.875 1.875-1.875h.375a3.75 3.75 0 013.75 3.75v1.875C13.5 8.161 14.34 9 15.375 9h1.875A3.75 3.75 0 0121 12.75v3.375C21 17.16 20.16 18 19.125 18h-9.75A1.875 1.875 0 017.5 16.125V3.375z" />
+                                    <path d="M15 5.25a5.23 5.23 0 00-1.279-3.434 9.768 9.768 0 016.963 6.963A5.23 5.23 0 0017.25 7.5h-1.875A.375.375 0 0115 7.125V5.25zM4.875 6H6v10.125A3.375 3.375 0 009.375 19.5H16.5v1.125c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 013 20.625V7.875C3 6.839 3.84 6 4.875 6z" />
+                                </svg>
+                                {copyText}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
+            {isLoading && <Spinner size={40} />}
         </div>
     )
 }

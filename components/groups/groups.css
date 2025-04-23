@@ -23,6 +23,7 @@
     background-color: var(--theme-color);
     color: var(--text-primary);
     padding: 2rem;
+    margin-bottom: 50px;
 }
 
 .groups-page-container {
@@ -427,6 +428,7 @@
     width: 1rem;
     height: 1rem;
     margin: 0;
+    color: white;
 }
 
 #copy-link-btn:hover {

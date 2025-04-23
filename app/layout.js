@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import RegisterSW from './register-sw';
+import { UserContextProvider } from "@/context/UserContext";
+import LoadingScreen from "@/utils/loading/loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +26,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <RegisterSW />
-        {children}
+        <UserContextProvider>
+          <LoadingScreen />
+          {children}
+        </UserContextProvider>
       </body>
     </html>
   );

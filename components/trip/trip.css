@@ -29,6 +29,7 @@
 .trip-details-container {
     max-width: 1200px;
     margin: 0 auto;
+    margin-top: 30px;
 }
 
 /* Trip Header */
@@ -253,6 +254,250 @@
     height: 1.25rem;
 }
 
+/* Add expense */
+.expense-form-container {
+    background: var(--theme-light);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    /* max-width: 500px; */
+    margin: 0 auto;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.category-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.category-option {
+    padding: 8px 16px;
+    background: var(--theme-light);
+    border: 1px solid #dddddd30;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.category-option:hover {
+    background: var(--theme-light);
+}
+
+.category-option.selected {
+    background: #4d8eb6;
+    color: white;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dddddd30;
+    background: var(--theme-light);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.amount-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 12px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.amount-input-group input {
+    padding-left: 30px;
+    flex: 1;
+}
+
+.gst-toggle {
+    display: flex;
+    align-items: center;
+    margin-left: 16px;
+    gap: 8px;
+}
+
+.gst-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.gst-percentage {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gst-percentage input {
+    width: 50px;
+    padding: 8px;
+}
+
+.member-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.member-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #dddddd30;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.member-option:hover {
+    background: var(--theme-lighter);
+}
+
+.member-option.selected {
+    border-color: #4db6ac;
+}
+
+.member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.add-exception-btn {
+    background: none;
+    border: none;
+    color: #4db6ac;
+    font-weight: 500;
+    margin-left: 12px;
+    cursor: pointer;
+}
+
+.exceptions-list {
+    margin-top: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.exception-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.exception-item:last-child {
+    border-bottom: none;
+}
+
+.remove-exception {
+    background: none;
+    border: none;
+    color: #e57373;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.exception-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.add-btn{
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.exception-form select,
+.exception-form input {
+    flex: 1;
+    min-width: 120px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.submit-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: var(--theme-light);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.cancel-btn:hover{
+    background: var(--theme-lighter);
+}
 /* Settle Up Tab Specifics */
 .settlement-section {
     margin-bottom: 2rem;
@@ -652,6 +897,213 @@
     border-radius: var(--border-radius-sm);
     margin-top: 1rem;
 }
+/* Settings */
+/* Settings Tab Styles */
+.settings-container {
+    padding: 1.5rem;
+}
+
+.settings-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #e0e0ff;
+    margin-bottom: 1rem;
+}
+
+.setting-card {
+    background: #252845;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.display-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.setting-value {
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+.edit-btn {
+    background: rgba(79, 106, 245, 0.1);
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-btn:hover {
+    background: rgba(79, 106, 245, 0.2);
+}
+
+.edit-btn svg {
+    width: 18px;
+    height: 18px;
+    color: #4f6af5;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.settings-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    color: #ffffff;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.save-btn,
+.cancel-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn {
+    background: #4f6af5;
+    color: white;
+    border: none;
+}
+
+.save-btn:hover {
+    background: #3e5bd4;
+}
+
+.cancel-btn {
+    background: transparent;
+    color: #a0a0c0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Photo Section */
+.photo-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.group-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.upload-btn {
+    background: rgba(79, 106, 245, 0.1);
+    border: 1px dashed rgba(79, 106, 245, 0.3);
+    border-radius: 6px;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #4f6af5;
+    font-weight: 500;
+}
+
+.upload-btn:hover {
+    background: rgba(79, 106, 245, 0.2);
+}
+
+.upload-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Danger Zone */
+.danger-zone .section-title {
+    color: #ff6b6b;
+}
+
+.danger-card {
+    background: rgba(255, 107, 107, 0.05);
+    border: 1px solid rgba(255, 107, 107, 0.1);
+}
+
+.danger-content {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.warning-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #ff6b6b;
+}
+
+.danger-text {
+    flex: 1;
+}
+
+.danger-text p {
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.danger-text small {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+.delete-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 6px;
+    color: #ff6b6b;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: rgba(255, 107, 107, 0.2);
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -686,6 +1138,10 @@
 @media (max-width: 480px) {
     .trip-details-app {
         padding: 1rem;
+    }
+
+    .trip-details-container{
+        margin-top: 50px;
     }
 
     .expense-list-item {
