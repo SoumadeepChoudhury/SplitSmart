@@ -79,7 +79,7 @@ export const UserContextProvider = ({ children }) => {
                                         grp.token = otherGrpData.token;
                                         grp.recentActivity = otherGrpData.recentActivity || null;
                                         grp.memberCount = otherGrpData.members.length;
-                                        grp.activeTripsCount = otherGrpData.activeTrips || 2;
+                                        grp.activeTripsCount = otherGrpData.activeTrips || 0;
                                         grp.initial = otherGrpData.name.charAt(0).toUpperCase();
                                         grp.color = colors[parseInt(Math.random() * 10)];
                                     }

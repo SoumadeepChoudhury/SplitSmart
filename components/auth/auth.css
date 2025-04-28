@@ -54,6 +54,19 @@ p {
     border-color: #ff0000;
 }
 
+.forgot-password {
+    align-self: flex-end;
+    font-size: 0.85rem;
+    color: #454a82;
+    cursor: pointer;
+    margin: -0.5rem 0 1rem 0;
+    text-align: right;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
 .continue-btn {
     background-color: #41467d;
     color: white;

@@ -3,13 +3,12 @@ import { useState, useRef } from 'react';
 import './auth.css';
 import { auth, db } from '@/firebase';
 import { useUserContext } from '@/context/UserContext';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
 import Spinner from '@/utils/spinner/spinner';
 import { get, ref, set } from 'firebase/database';
-// import USERDATA from '@/utils/userData';
 
 export default function Auth() {
-    const [isSignIn, setIsSignIn] = useState(false);
+    const [isSignIn, setIsSignIn] = useState(true);
     const { setUser, setCurrentTab, loading, setLoading } = useUserContext();
 
     const [error, setError] = useState(null);
@@ -48,10 +47,6 @@ export default function Auth() {
                             photoURL: '',
                             groups: [],
                         }).then(() => {
-                            //adding to local data set.
-                            // USERDATA.name = name;
-                            // USERDATA.email = email;
-                            // USERDATA.photoURL = '';
                             console.log("Data saved successfully");
                         }).catch((error) => {
                             console.error("Error saving data: ", error);
@@ -84,10 +79,6 @@ export default function Auth() {
                             photoURL: result.user.photoURL,
                             groups: [],
                         }).then(() => {
-                            //adding to local dataset
-                            // USERDATA.name = result.user.displayName;
-                            // USERDATA.email = result.user.email;
-                            // USERDATA.photoURL = result.user.photoURL;
                             console.log("Data saved successfully");
                         }).catch((error) => {
                             console.error("Error saving data: ", error);
@@ -108,16 +99,28 @@ export default function Auth() {
                 setUser(userCredential.user);
                 setLoading(false)
                 setCurrentTab('home');
-                //adding to local data
-                // USERDATA.name = userCredential.user.displayName;
-                // USERDATA.email = userCredential.user.email;
-                // USERDATA.photoURL = userCredential.user.photoURL;
             })
             .catch((error) => {
                 setError(error.message);
                 alert(error.message.replace("Firebase: ", ""));
                 setLoading(false);
             });
+    }
+
+    function resetPassword() {
+        const _email = emailRef.current.value;
+        if (_email)
+            try {
+                setLoading(true);
+                sendPasswordResetEmail(auth, _email).then(() => {
+                    setLoading(false);
+                });
+            } catch (error) {
+                setLoading(false);
+                setError(error.message);
+            }
+        else
+            setError("Enter Email")
     }
 
     return (
@@ -131,9 +134,14 @@ export default function Auth() {
                 {!isSignIn ? <input type="name" placeholder="Enter your full name..." className="email-input" ref={nameRef} /> : null}
                 <input type="email" placeholder="Enter your email..." className={(error && error?.includes('email') ? "error " : "") + "email-input"} ref={emailRef} onChange={() => setError(null)} required />
                 <input type="password" placeholder="Enter your password..." className={(error && error?.includes('password') ? "error " : "") + "email-input"} ref={passwordRef} required />
-
+                {/* {isSignIn ? <a className='forgot-password' onClick={resetPassword}>Forgot password?</a> : null} */}
+                {isSignIn ? <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+                    <p className="forgot-password" onClick={resetPassword}>
+                        Forgot your password?
+                    </p>
+                </div> : null}
                 <button className="continue-btn" onClick={handleSignInUp}>Sign {!isSignIn ? "Up" : "In"}</button>
-
+                {error === "Enter Email" ? <p style={{ color: 'red' }}>*Enter email...</p> : null}
                 <div className="divider">
                     <span>OR</span>
                 </div>
