@@ -98,11 +98,6 @@ export default function Dashboard() {
 
     }
 
-    function createGrp() {
-        setIsCreateGroupClicked(true);
-        setCurrentTab('groups');
-    }
-
     return (
         <div className="dashboard-app">
             <div className="dashboard-container">
@@ -160,7 +155,10 @@ export default function Dashboard() {
                     <div className="section-header">
                         <h2>Your Groups</h2>
                         <div>
-                            <button className="view-all" onClick={createGrp}>
+                            <button className="view-all" onClick={() => {
+                                setIsCreateGroupClicked(true);
+                                setCurrentTab('groups');
+                            }}>
                                 Create Group
                             </button>
                             {myData.groups.length > 0 ? <button className="view-all" onClick={() => setCurrentTab('groups')}>View All</button> : null}
@@ -169,8 +167,8 @@ export default function Dashboard() {
 
                     {myData.groups.length > 0 ? <div className="groups-scroll-container">
                         {myData.groups.map((group, index) => (
-                            <div className="group-card">
-                                <div key={index} onClick={() => { setSelectedGroup(group); setCurrentTab('groups') }}>
+                            <div key={index} className="group-card">
+                                <div  onClick={() => { setSelectedGroup(group); setCurrentTab('groups') }}>
                                     <div className="group-icon" style={{ backgroundColor: group.color }}>
                                         {group.initial}
                                     </div>
