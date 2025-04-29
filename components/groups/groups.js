@@ -1,5 +1,5 @@
 'use client';
-import { get, ref, set } from 'firebase/database';
+import { ref, set } from 'firebase/database';
 import './groups.css'
 
 import { useState, useRef, useEffect } from 'react';
@@ -10,9 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 import Spinner from '@/utils/spinner/spinner';
 
 export default function Groups({ onGroupClick }) {
-    const { user, myData } = useUserContext();
+    const { user, myData, isCreateGroupClicked, setIsCreateGroupClicked } = useUserContext();
 
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [showCreateForm, setShowCreateForm] = useState(isCreateGroupClicked);
     const [showShareLink, setShowShareLink] = useState(false);
     const [sortOption, setSortOption] = useState('recent');
     const [searchQuery, setSearchQuery] = useState('');
@@ -113,6 +113,7 @@ export default function Groups({ onGroupClick }) {
 
 
         setShowCreateForm(false);
+        setIsCreateGroupClicked(false);
         createLink(groupId).then((link) => {
             setLink(link);
         });
@@ -248,7 +249,7 @@ export default function Groups({ onGroupClick }) {
                             <h2>Create New Group</h2>
                             <button
                                 className="close-form-btn"
-                                onClick={() => setShowCreateForm(false)}
+                                onClick={() => { setShowCreateForm(false); setIsCreateGroupClicked(false); }}
                                 aria-label="Close form"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">

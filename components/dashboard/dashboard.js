@@ -4,11 +4,12 @@ import './dashboard.css';
 import { useUserContext } from '@/context/UserContext';
 
 export default function Dashboard() {
-    const { myData, setSelectedGroup, setCurrentTab } = useUserContext();
+    const { myData, setSelectedGroup, setCurrentTab, setIsCreateGroupClicked } = useUserContext();
     const [upcomingTrip, setUpcomingTrip] = useState('Loading...');
     const [totalGrps, setTotalGrps] = useState();
     const [totalTrips, setTotalTrips] = useState();
     const [recentActivities, setRecentActivities] = useState([]);
+    const [isCopied, setIsCopied] = useState(false);
 
     useEffect(() => {
         setTotalGrps(getTotalGrps());
@@ -76,6 +77,32 @@ export default function Dashboard() {
         return _recentActivities;
     }
 
+    async function getLink(token) {
+        let fullUrl = typeof window !== 'undefined' ? window.location.href : '';
+        fullUrl = fullUrl + "join/group/" + token;
+        try {
+            const permissionStatus = await navigator.permissions.query({ name: 'clipboard-write' });
+
+            if (permissionStatus.state === 'granted' || permissionStatus.state === 'prompt') {
+                await navigator.clipboard.writeText(fullUrl);
+                setIsCopied(true);
+                setTimeout(() => {
+                    setIsCopied(false);
+                }, 3000);
+            } else {
+                alert('Clipboard access denied.');
+            }
+        } catch (err) {
+            console.error('Clipboard error:', err);
+        }
+
+    }
+
+    function createGrp() {
+        setIsCreateGroupClicked(true);
+        setCurrentTab('groups');
+    }
+
     return (
         <div className="dashboard-app">
             <div className="dashboard-container">
@@ -132,17 +159,27 @@ export default function Dashboard() {
                 <section className="your-groups">
                     <div className="section-header">
                         <h2>Your Groups</h2>
-                        {myData.groups.length > 0 ? <button className="view-all" onClick={() => setCurrentTab('groups')}>View All</button> : null}
+                        <div>
+                            <button className="view-all" onClick={createGrp}>
+                                Create Group
+                            </button>
+                            {myData.groups.length > 0 ? <button className="view-all" onClick={() => setCurrentTab('groups')}>View All</button> : null}
+                        </div>
                     </div>
 
                     {myData.groups.length > 0 ? <div className="groups-scroll-container">
                         {myData.groups.map((group, index) => (
-                            <div key={index} className="group-card" onClick={() => { setSelectedGroup(group); setCurrentTab('groups') }}>
-                                <div className="group-icon" style={{ backgroundColor: group.color }}>
-                                    {group.initial}
+                            <div className="group-card">
+                                <div key={index} onClick={() => { setSelectedGroup(group); setCurrentTab('groups') }}>
+                                    <div className="group-icon" style={{ backgroundColor: group.color }}>
+                                        {group.initial}
+                                    </div>
+                                    <h3 className="group-name">{group.name}</h3>
+                                    <p className="group-members">{group.memberCount} Member{group.memberCount > 1 ? 's' : ''}</p>
                                 </div>
-                                <h3 className="group-name">{group.name}</h3>
-                                <p className="group-members">{group.memberCount} Members</p>
+                                <button className="view-all" style={{ marginTop: '1rem' }} onClick={() => getLink(group.token)}>
+                                    {isCopied ? "Link Copied" : "Invite Member"}
+                                </button>
                             </div>
                         ))}
                     </div> : (<div className="no-groups-message">
@@ -229,7 +266,7 @@ export default function Dashboard() {
 
                 </section>
 
-                
+
             </div>
         </div>
     )

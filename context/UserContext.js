@@ -16,6 +16,8 @@ export const UserContextProvider = ({ children }) => {
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [myData, setMyData] = useState({ name: '', email: '', photoURL: '', groups: [] });
 
+    const [isCreateGroupClicked,setIsCreateGroupClicked] = useState(false);
+
     async function getName(id) {
         return (await get(ref(db, `users/${id}/name`))).val()
     }
@@ -147,7 +149,9 @@ export const UserContextProvider = ({ children }) => {
         selectedTrip,
         setSelectedTrip,
         selectedExpense,
-        setSelectedExpense
+        setSelectedExpense,
+        isCreateGroupClicked,
+        setIsCreateGroupClicked
     }
 
     return (<UserContext.Provider value={values}>

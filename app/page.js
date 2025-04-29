@@ -13,7 +13,7 @@ import Spinner from "@/utils/spinner/spinner";
 import ExpenseDetail from "@/components/expense/expense";
 
 export default function Home() {
-  const { currentTab,selectedGroup, setSelectedGroup,selectedTrip,setSelectedTrip,selectedExpense,setSelectedExpense } = useUserContext();
+  const { currentTab, selectedGroup, setSelectedGroup, selectedTrip, setSelectedTrip, selectedExpense, setSelectedExpense } = useUserContext();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function Home() {
           case 'home':
             return <Dashboard />;
           case 'groups':
-            return <Groups onGroupClick={(group) => setSelectedGroup(group)} />;
+            return <Groups onGroupClick={(group) => setSelectedGroup(group)}/>;
           case 'profile':
             return <Profile />;
           default:

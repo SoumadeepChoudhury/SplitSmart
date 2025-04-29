@@ -224,7 +224,6 @@ export default function GroupDetails({ group, goBack, onTripClick }) {
     };
 
     function getLink() {
-        //Create a link with the unique id of the group, i.e., groupId
         const fullUrl = typeof window !== 'undefined' ? window.location.href : '';
         link = fullUrl + "join/group/" + group.token;
 
