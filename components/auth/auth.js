@@ -134,7 +134,7 @@ export default function Auth() {
                 {!isSignIn ? <input type="name" placeholder="Enter your full name..." className="email-input" ref={nameRef} /> : null}
                 <input type="email" placeholder="Enter your email..." className={(error && error?.includes('email') ? "error " : "") + "email-input"} ref={emailRef} onChange={() => setError(null)} required />
                 <input type="password" placeholder="Enter your password..." className={(error && error?.includes('password') ? "error " : "") + "email-input"} ref={passwordRef} required />
-                {/* {isSignIn ? <a className='forgot-password' onClick={resetPassword}>Forgot password?</a> : null} */}
+                
                 {isSignIn ? <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
                     <p className="forgot-password" onClick={resetPassword}>
                         Forgot your password?

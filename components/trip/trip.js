@@ -263,8 +263,7 @@ export default function Trips({ details, goBack, onExpenseClick }) {
                 })
             }
             setMyTotalShare(mts);
-        } else
-            console.log('--------> ', tripDetailsObject.expenses)
+        }
         set_Payments(payments);
 
     }
